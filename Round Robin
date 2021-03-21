@@ -1,0 +1,117 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int n,q;
+const int size = 1000;
+int cpuTime1[size],tempCpuTime[size],arrivalTimeAr[size],readyQueue[size];
+int calculatedwaiting [size];
+
+
+struct P
+{
+    int id;
+    int arrivalTime;
+    int cpuTime;
+
+
+    P()
+    {
+        ;
+    }
+    P(int x,int y,int p)
+    {
+        arrivalTime = x;
+        cpuTime = y;
+        id = p;
+    }
+};
+
+bool cmp(P x,P y)
+{
+    if(x.arrivalTime==y.arrivalTime)
+        return x.id<y.id;
+    return x.arrivalTime<y.arrivalTime;
+}
+
+void roundRobin()
+{
+    vector<P> v;
+
+    for(int i=1; i<=n; i++)
+    {
+        v.push_back(P(arrivalTimeAr[i],cpuTime1[i],i));
+    }
+
+    sort(v.begin(),v.end(),cmp);
+
+    queue<P> processQueue;
+    processQueue.push(v[0]);
+    int cur  = v[0].arrivalTime;
+    int i = 1;
+
+    int x=0;
+    while(!processQueue.empty())
+    {
+        P temp  =processQueue.front();
+        processQueue.pop();
+        calculatedwaiting [temp.id]+= cur-temp.arrivalTime;
+        x =  min(q,temp.cpuTime);
+        temp.cpuTime-= x;
+
+        cur+= x;
+        while(i<n && v[i].arrivalTime<=cur)
+        {
+            processQueue.push(v[i]);
+            i++;
+
+        }
+        if(temp.cpuTime==0)
+        {
+            readyQueue[temp.id] =  cur;
+        }
+        else
+        {
+            temp.arrivalTime  = cur;
+            processQueue.push(temp);
+        }
+    }
+    cout<<endl;
+}
+
+int main()
+{
+    cout<<"Enter the number of process :";
+    cin>>n;
+
+    cout<<"Enter the CPU times"<<endl;
+    for(int i=1; i<=n; i++)
+    {
+        cin>>cpuTime1[i];
+        tempCpuTime[i] = cpuTime1[i];
+    }
+
+    cout<<"Enter the arrival times"<<endl;
+    for(int i=1; i<=n; i++)
+        cin>>arrivalTimeAr[i];
+
+    cout<<"Enter time Quantum: ";
+    cin>>q;
+
+    roundRobin();
+
+    int w,t;
+    w = t = 0;
+
+    for(int i=1 ; i<=n ; i++){
+        cout<<"Process: "<<i<< " waiting time: "<<calculatedwaiting [i]<< " Turnaround time: "<<calculatedwaiting [i]+tempCpuTime[i]<<endl;
+        w+= calculatedwaiting [i];
+        t+= calculatedwaiting [i]+tempCpuTime[i];
+
+    }
+
+    cout<<endl;
+    cout<<"Average Waiting time  = "<<fixed<<setprecision(2)<<(w*1.0)/(n*1.0)<<endl;
+    cout<<"Average Turnaround time  = "<<fixed<<setprecision(2)<<(t*1.0)/(n*1.0)<<endl;
+
+    return 0;
+}
