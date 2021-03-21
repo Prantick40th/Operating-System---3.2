@@ -1,0 +1,118 @@
+#include<bits/stdc++.h>
+#define Ins 100
+using namespace std;
+
+int m,n;
+int total = 0;
+
+bool is_compare(int process_id, int allocated[][Ins],int need[][Ins], int available[])
+{
+
+	bool flag = true;
+
+	for (int i=0; i<n; i++) {
+
+		if (need[process_id][i] > available[i])
+			flag = false;
+	}
+	return flag;
+}
+
+
+void safe_sequence(bool marked[], int allocated[][Ins], int max[][Ins],int need[][Ins], int available[], vector<int> checker)
+{
+    if(total == 1)
+        return;
+
+	for (int i = 0; i < m; i++) {
+
+		if (!marked[i] && is_compare(i, allocated, need, available)) {
+
+
+			marked[i] = true;
+
+			for (int j=0; j<n; j++)
+				available[j] += allocated[i][j];
+
+			checker.push_back(i);
+
+			safe_sequence(marked, allocated, max, need, available, checker);
+			checker.pop_back();
+
+			marked[i] = false;
+
+			for (int j=0; j<n; j++)
+				available[j] -= allocated[i][j];
+		}
+	}
+
+	if (checker.size() == m) {
+		total++;
+		for (int i=0; i<m; i++) {
+			cout << "P" << checker[i] + 1;
+			if (i != (m-1))
+				cout << "--> ";
+		}
+		cout << endl;
+	}
+}
+
+int main()
+{
+    cout<<"Enter number of processes : ";
+    cin>>m;
+    cout<<endl;
+
+	cout<<"Enter number of resources : ";
+    cin>>n;
+    cout<<endl;
+
+	int allocated[m][Ins], maxAllocation[m][Ins], need[m][Ins];
+	int resources[n], availeableInstances[n];
+    vector<int> checker;
+	bool marked[m];
+	memset(marked, false, sizeof(marked));
+
+
+    cout<<"Enter number of instances available of each resource : ";
+    for(int i=0; i<n; i++)
+        cin>>resources[i];
+
+
+    for(int i=0; i<m; i++)
+    {
+        cout<<"Enter no. of instances of resources allocated to process p["<<i+1<<"] : ";
+        for(int y=0; y<n; y++)
+            cin>>allocated[i][y];
+    }
+    for(int i=0; i<m; i++)
+    {
+        cout<<"Enter max no. of instances of resources process p["<<i+1<<"] needs : ";
+        for(int y=0; y<n; y++)
+            cin>>maxAllocation[i][y];
+    }
+
+    for (int i=0; i<m; i++)
+    {
+        for (int j=0; j<n; j++)
+            need[i][j] = maxAllocation[i][j] - allocated[i][j];
+    }
+
+	for (int i=0; i<n; i++) {
+		int sum = 0;
+		for (int j=0; j<m; j++)
+			sum += allocated[j][i];
+		availeableInstances[i] = resources[i] - sum;
+	}
+
+	cout << "\nSafe sequence is:" << endl;
+	safe_sequence(marked, allocated, maxAllocation, need, availeableInstances,checker);
+
+	if(total>0)
+        cout << "\n\n" << total << " safe-sequence and deadlock avoided" << endl;
+    else if(total == 0)
+        cout << "Not Safe" << endl;
+
+
+	return 0;
+}
