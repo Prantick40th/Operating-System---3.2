@@ -1,0 +1,52 @@
+#include <thread>
+#include <mutex>
+#include <iostream>
+#define THREADS_NUM 10
+
+using namespace std;
+mutex runningMutex;
+int cnt = 0;
+
+void producerFun()
+{
+    runningMutex.lock();
+    cnt++;
+    cout<<"producer incremented to " <<cnt<<endl;
+    runningMutex.unlock();
+
+}
+
+void consumerFun()
+{
+    runningMutex.lock();
+    cnt--;
+    cout<<"consumer decremented to " <<cnt<<endl;
+    runningMutex.unlock();
+
+}
+
+int main()
+{  int i;
+   thread producer[THREADS_NUM];
+
+   cout << "Beginning value : " << cnt << endl<<endl;
+
+   for (i=0; i < THREADS_NUM; i++)
+      producer[i] = thread(&producerFun);
+
+   thread consumer[THREADS_NUM];
+   for (i=0; i < THREADS_NUM; i++)
+      consumer[i] = thread(&consumerFun);
+
+
+   for (i=0; i < THREADS_NUM; i++)
+      producer[i].join();
+   for (i=0; i < THREADS_NUM; i++)
+      consumer[i].join();
+
+   cout << "\n\nEnd of main value is: " << cnt << endl;
+   return 0;
+}
+
+
+
