@@ -1,0 +1,94 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+double avgWaitingTime,avgTurnaroundTime = 0;
+double ar[100];
+
+void FCFS(double n,vector<double>cputime,vector<double>arrival,vector<double>service,vector<double>waiting,vector<double>turnaround )
+{
+
+    service[0]=0 ;
+    waiting[0]=0 ;
+
+    for(int i=1; i<n; i++)
+    {
+        service[i] = service[i-1] + cputime[i-1];
+        waiting[i] = service[i] - arrival[i];
+
+        if(waiting[i]<0)
+            waiting [i] = 0;
+
+        avgWaitingTime+=waiting[i];
+    }
+
+    for(int i=0; i<n; i++)
+    {
+        turnaround[i] = waiting[i] + cputime[i];
+        avgTurnaroundTime+= turnaround[i];
+    }
+
+    for(int i=0; i<n ; i++ )
+        cout<<"Process : "<<i+1 <<" Waiting time :  " << waiting[i]<<" Turnaround time : "<< turnaround[i]<<endl;
+}
+
+
+int main()
+{
+    double n;
+    cout<<"Enter number of Process"<<endl;
+    cin>>n;
+
+    vector<double>waiting(n);
+    vector<double>service(n);
+    vector<double>turnaround (n);
+    vector<double>cputime(n);
+    vector<double>arrival(n);
+
+
+    cout<<"Enter CPU times :"<<endl;
+    for(int i=0; i<n; i++)
+    {
+        cin>> cputime[i];
+    }
+
+    cout<<"Enter arrival time :"<<endl;
+    for(int i=0; i<n; i++)
+    {
+        cin>> arrival[i];
+    }
+
+    int i,j;
+    double temp1=0;
+    double temp2=0;
+    for(i=0; i<n; i++)
+    {
+        for(j=i+1; j<n; j++)
+        {
+
+            if(arrival[i] > arrival[j])
+            {
+                temp1     = arrival[i];
+                temp2     = cputime[i];
+
+                arrival[i] = arrival[j];
+                cputime[i] = cputime[j];
+
+                arrival[j] = temp1;
+                cputime[j] = temp2;
+            }
+        }
+    }
+
+    //sort(arrival.begin(), arrival.end());
+
+    FCFS(n,cputime,arrival,service,waiting,turnaround);
+
+    cout<<endl;
+    cout<<"Average waiting time : "<< avgWaitingTime/n<<endl;
+    cout<<"Average turnaround time : " << avgTurnaroundTime/n <<endl;
+
+
+
+
+
+}
