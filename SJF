@@ -1,0 +1,53 @@
+#include <bits/stdc++.h>
+#include<stdio.h>
+using namespace std;
+
+double n;
+double avgWaitingTime,avgTurnaroundTime = 0;
+vector<double>waiting(n);
+vector<double>service(n);
+vector<double>turnaround (n);
+vector<double>cputime(n);
+vector<double>arrival(n);
+
+void wTime(double n,vector<double>cputime,vector<double>arrival,vector<double>service,vector<double>waiting)
+{
+    service[0]= waiting[0]= 0 ;
+
+    for(int i=1; i<n; i++)
+    {
+        service[i] = service[i-1] + cputime[i-1];
+        waiting [i] = service [i] - arrival [i];
+
+        if(waiting[i]<0)
+            waiting [i] = 0;
+
+        // printf("%d %lf",i,waiting[i]);
+    }
+}
+
+void SJF(double n,vector<double>cputime,vector<double>arrival,vector<double>service,vector<double>waiting,vector<double>turnaround )
+{
+
+    //service[0]= waiting[0]= 0 ;
+
+    for(int i=1; i<n; i++)
+    {
+        service[i] = service[i-1] + cputime[i-1];
+        waiting [i] = service [i] - arrival [i];
+
+        if(waiting[i]<0)
+            waiting [i] = 0;
+
+        avgWaitingTime+=waiting [i];
+    }
+
+    for(int i=0; i<n; i++)
+    {
+        turnaround[i] = waiting[i] + cputime[i];
+        avgTurnaroundTime+= turnaround[i];
+    }
+
+    for(int i = 0; i<n ; i++ )
+        cout<<"Process : "<<i+1 <<" Waiting time :  " << waiting[i]<<" Turnaround time : "<< turnaround[i]<<endl;
+}
