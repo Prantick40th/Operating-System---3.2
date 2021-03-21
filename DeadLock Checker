@@ -1,0 +1,83 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m;
+int cycle=0;
+
+int color[100],store[100],parent[100];
+
+vector<int>VDFS[100],c[100];
+
+void dfs(int u,int p,int& cycle)
+{
+    if(color[u]==2)
+        return;
+    if(color[u]==1)
+    {
+        cycle++;
+        int cur=p;
+        store[p]=cycle;
+        while(cur!=u)
+        {
+            cur=parent[cur];
+            store[cur]=cycle;
+        }
+        return;
+    }
+    parent[u]=p;
+    color[u]=1;
+    for(int i=0;i<VDFS[u].size();i++)
+    {
+        int v=VDFS[u][i];
+        if(v==parent[u])
+            continue;
+        dfs(v,u,cycle);
+    }
+    color[u]=2;
+
+}
+
+int main()
+{
+    cout<<"Enter number of nodes : "<<endl;
+    cin>>n;
+    cout<<"Enter number of edges : "<<endl;
+    cin>>m;
+    cout<<"Enter all edges"<<endl;
+
+    int x,y;
+    for(int i=0;i<m;i++)
+    {
+        cin>>x>>y;
+        VDFS[x].push_back(y);
+        VDFS[y].push_back(x);
+    }
+
+    dfs(1,0,cycle);
+
+    if(cycle==0)
+    {
+        cout<<"No deadlock "<<endl;
+        return 0;
+    }
+
+    cout<<endl;
+    cout<<endl;
+    cout<<"Got deadlocks : "<<cycle<<endl;
+    cout<<endl;
+
+    for(int i=0;i<n;i++)
+    {
+        if(store[i]!=0)
+        {
+            c[store[i]].push_back(i);
+        }
+    }
+    cout<<"Deadlock nodes"<<endl;
+    for(int i=1;i<=cycle;i++)
+    {
+        cout<<"node "<<c[i][0]<<endl;
+    }
+
+    return 0;
+
+}
